@@ -17,6 +17,7 @@ type Instruction int
 const (
 	Add Instruction = iota
 	Delete
+	Help
 	NoOp
 )
 
@@ -70,7 +71,8 @@ func (p *parser) Parse() (*Chunk, error) {
 		Instruction: instruction,
 	}
 
-	if instruction == Add {
+	switch instruction {
+	case Add:
 		transactionType, err := p.transactionType()
 		if err != nil {
 			return nil, p.wrapError(err)
@@ -88,12 +90,14 @@ func (p *parser) Parse() (*Chunk, error) {
 			return nil, p.wrapError(err)
 		}
 		chunk.Amount = *amount
-	} else if instruction == Delete {
+	case Delete:
 		id, err := p.id()
 		if err != nil {
 			return nil, p.wrapError(err)
 		}
 		chunk.ID = *id
+	case Help:
+		// Do nothing
 	}
 
 	return chunk, nil
@@ -137,6 +141,8 @@ func (p *parser) instruction() (Instruction, error) {
 		return Add, nil
 	case "DEL":
 		return Delete, nil
+	case "HELP":
+		return Help, nil
 	default:
 		return NoOp, fmt.Errorf(errorFormatInstructionToken, *token)
 	}

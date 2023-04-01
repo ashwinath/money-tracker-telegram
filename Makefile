@@ -1,6 +1,6 @@
 test:
 	@go clean -testcache
-	@go test ./...
+	@go test -cover -race ./...
 
 .PHONY: db
 db:

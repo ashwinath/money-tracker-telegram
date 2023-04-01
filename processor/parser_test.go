@@ -102,6 +102,14 @@ func TestParser(t *testing.T) {
 			expectedError: nil,
 		},
 		{
+			name:       "Help",
+			testString: "help",
+			expected: Chunk{
+				Instruction: Help,
+			},
+			expectedError: nil,
+		},
+		{
 			name:          "wrong instruction",
 			testString:    "update own computer and monitors 2010",
 			expected:      Chunk{},

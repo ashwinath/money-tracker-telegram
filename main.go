@@ -6,6 +6,7 @@ import (
 
 	"github.com/ashwinath/money-tracker-telegram/config"
 	database "github.com/ashwinath/money-tracker-telegram/db"
+	"github.com/ashwinath/money-tracker-telegram/processor"
 	"github.com/ashwinath/money-tracker-telegram/telegram"
 )
 
@@ -25,16 +26,27 @@ func main() {
 		c.DBConfig.DBName,
 		c.DBConfig.Port,
 	)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	defer db.Close()
 
+	processorManager, err := processor.NewManager(db)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	t, err := telegram.New(c.APIKey, c.Debug)
+	t, err := telegram.New(
+		c.APIKey,
+		c.Debug,
+		c.AllowedUser,
+		processorManager,
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	t.Run(c.AllowedUser)
+	t.Run()
 }
