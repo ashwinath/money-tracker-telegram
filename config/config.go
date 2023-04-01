@@ -7,8 +7,17 @@ import (
 )
 
 type Config struct {
-	APIKey string `yaml:"apiKey"`
-	Debug  bool   `yaml:"debug"`
+	APIKey   string   `yaml:"apiKey"`
+	Debug    bool     `yaml:"debug"`
+	DBConfig DBConfig `yaml:"dbConfig"`
+}
+
+type DBConfig struct {
+	Host     string `yaml:"host"`
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
+	DBName   string `yaml:"dbName"`
+	Port     uint   `yaml:"port"`
 }
 
 func New(path string) (*Config, error) {

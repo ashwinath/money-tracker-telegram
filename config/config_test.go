@@ -20,5 +20,12 @@ func TestNewConfig(t *testing.T) {
 	assert.Equal(t, Config{
 		APIKey: "YourTelegramApiKey",
 		Debug:  true,
+		DBConfig: DBConfig{
+			Host:     "localhost",
+			User:     "postgres",
+			Password: "password",
+			DBName:   "postgres",
+			Port:     5432,
+		},
 	}, *c)
 }

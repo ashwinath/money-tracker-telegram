@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/ashwinath/money-tracker-telegram/config"
+	database "github.com/ashwinath/money-tracker-telegram/db"
 	"github.com/ashwinath/money-tracker-telegram/telegram"
 )
 
@@ -16,6 +17,20 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	db, err := database.New(
+		c.DBConfig.Host,
+		c.DBConfig.User,
+		c.DBConfig.Password,
+		c.DBConfig.DBName,
+		c.DBConfig.Port,
+	)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	db.Migrate()
 
 	t, err := telegram.New(c.APIKey, c.Debug)
 	if err != nil {

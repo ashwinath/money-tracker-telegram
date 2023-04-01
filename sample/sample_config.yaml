@@ -1,2 +1,8 @@
 apiKey: YourTelegramApiKey
 debug: true
+dbConfig:
+  host: localhost
+  user: postgres
+  password: password
+  dbName: postgres
+  port: 5432
