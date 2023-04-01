@@ -52,6 +52,21 @@ func (d *DB) queryTransaction(id uint) (*Transaction, error) {
 	return tx, nil
 }
 
+// returns the old copy of the deleted transaction
+func (d *DB) DeleteTransaction(id uint) (*Transaction, error) {
+	deletedTx, err := d.queryTransaction(id)
+	if err != nil {
+		return nil, err
+	}
+
+	result := d.DB.Delete(&Transaction{ID: id})
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return deletedTx, nil
+}
+
 func (d *DB) Close() error {
 	db, err := d.DB.DB()
 	if err != nil {

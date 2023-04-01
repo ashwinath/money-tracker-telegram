@@ -33,12 +33,12 @@ housing | Amount spent on housing needs
 ### Adding a transaction
 
 User: `ADD <TYPE> <CLASSIFICATION> <PRICE (no $ sign)>`
-Service returns: `Transaction ID: <ID> Created, Chunk: <chunk>`
+Service returns: `Created Transaction ID: <ID>, Transaction: <transaction>`
 
 ### Deleting a transaction
 
 User: `DEL <ID>`
-Service returns: `Transaction ID: <ID> Deleted, Chunk: <chunk>`
+Service returns: `Deleted Transaction ID: <ID>, Transaction: <transaction>`
 
 ## Web scraping (internal network only)
 
