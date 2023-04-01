@@ -27,10 +27,35 @@ func New(host, user, password, dbName string, port uint) (*DB, error) {
 		return nil, err
 	}
 
+	// Migrate database
+	db.AutoMigrate(&Transaction{})
+
 	return &DB{DB: db}, nil
 }
 
-// Migrate handles all migrations of database tables.
-func (d *DB) Migrate() {
-	d.DB.AutoMigrate(&Transaction{})
+func (d *DB) InsertTransaction(tx *Transaction) (*Transaction, error) {
+	result := d.DB.Create(tx)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return d.queryTransaction(tx.ID)
+}
+
+func (d *DB) queryTransaction(id uint) (*Transaction, error) {
+	tx := &Transaction{}
+	result := d.DB.First(tx, id)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return tx, nil
+}
+
+func (d *DB) Close() error {
+	db, err := d.DB.DB()
+	if err != nil {
+		return err
+	}
+	return db.Close()
 }

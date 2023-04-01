@@ -25,12 +25,11 @@ func main() {
 		c.DBConfig.DBName,
 		c.DBConfig.Port,
 	)
+	defer db.Close()
 
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	db.Migrate()
 
 	t, err := telegram.New(c.APIKey, c.Debug)
 	if err != nil {

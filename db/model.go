@@ -13,9 +13,9 @@ const TypeOwn TransactionType = "OWN"
 const TypeSpecialOwn TransactionType = "SPECIAL_OWN"
 
 type Transaction struct {
-	ID              uint            `gorm:"primaryKey"`
-	Date            time.Time       `gorm:"index"`
-	TransactionType TransactionType `gorm:"column:type"`
-	Classification  string
-	Amount          float64
+	ID             uint            `gorm:"primaryKey"`
+	Date           time.Time       `gorm:"index"`
+	Type           TransactionType `gorm:"column:type"`
+	Classification string
+	Amount         float64
 }
