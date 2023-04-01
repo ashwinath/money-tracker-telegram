@@ -17,6 +17,8 @@ Type | Explanation
 reim | Amount to be reimbursed, usually paying first using CC and friends paying back later.
 shared reim | Amount to be reimbursed, usually paying first using CC and taking from shared account.
 special shared reim | Amount to be reimbursed, usually paying first using CC and taking from shared account, not counting into regular spend.
+shared | Amount that is shared but other party had paid first
+special shared | Amount that is shared but other party had paid first and it's a one off thing
 own | Regular type of spending for ownself.
 
 ### Classification
@@ -31,12 +33,12 @@ housing | Amount spent on housing needs
 ### Adding a transaction
 
 User: `ADD <TYPE> <CLASSIFICATION> <PRICE (no $ sign)>`
-Service returns: `Transaction ID: <ID> Created`
+Service returns: `Transaction ID: <ID> Created, Chunk: <chunk>`
 
 ### Deleting a transaction
 
 User: `DEL <ID>`
-Service returns: `Transaction ID: <ID> Deleted`
+Service returns: `Transaction ID: <ID> Deleted, Chunk: <chunk>`
 
 ## Web scraping (internal network only)
 
