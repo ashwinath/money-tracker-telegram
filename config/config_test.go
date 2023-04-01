@@ -18,8 +18,9 @@ func TestNewConfig(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, Config{
-		APIKey: "YourTelegramApiKey",
-		Debug:  true,
+		APIKey:      "YourTelegramApiKey",
+		AllowedUser: "yourTelegramHandle",
+		Debug:       true,
 		DBConfig: DBConfig{
 			Host:     "localhost",
 			User:     "postgres",

@@ -7,9 +7,10 @@ import (
 )
 
 type Config struct {
-	APIKey   string   `yaml:"apiKey"`
-	Debug    bool     `yaml:"debug"`
-	DBConfig DBConfig `yaml:"dbConfig"`
+	APIKey      string   `yaml:"apiKey"`
+	Debug       bool     `yaml:"debug"`
+	DBConfig    DBConfig `yaml:"dbConfig"`
+	AllowedUser string   `yaml:"allowedUser"`
 }
 
 type DBConfig struct {

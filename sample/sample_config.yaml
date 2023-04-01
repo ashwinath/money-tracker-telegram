@@ -1,4 +1,5 @@
 apiKey: YourTelegramApiKey
+allowedUser: yourTelegramHandle
 debug: true
 dbConfig:
   host: localhost

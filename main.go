@@ -37,5 +37,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	t.Run()
+	t.Run(c.AllowedUser)
 }

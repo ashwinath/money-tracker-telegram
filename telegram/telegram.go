@@ -23,14 +23,14 @@ func New(apiKey string, isDebug bool) (*Telegram, error) {
 	return &Telegram{bot: bot}, nil
 }
 
-func (t *Telegram) Run() {
+func (t *Telegram) Run(allowedUser string) {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
 	updates := t.bot.GetUpdatesChan(u)
 
 	for update := range updates {
-		if update.Message != nil { // If we got a message
+		if update.Message.From.UserName == allowedUser && update.Message != nil { // If we got a message
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
