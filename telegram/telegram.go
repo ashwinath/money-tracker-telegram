@@ -52,7 +52,10 @@ func (t *Telegram) Run() {
 			msg.ParseMode = "Markdown"
 			log.Printf("[bot to %s] %s", update.Message.From.UserName, *reply)
 
-			t.bot.Send(msg)
+			_, err := t.bot.Send(msg)
+			if err != nil {
+				log.Printf("[bot to %s] error: %s", update.Message.From.UserName, err)
+			}
 		}
 	}
 }
