@@ -44,11 +44,13 @@ func (t *Telegram) Run() {
 
 	for update := range updates {
 		if update.Message.From.UserName == t.allowedUser && update.Message != nil { // If we got a message
-			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-			reply := t.processorManager.ProcessMessage(update.Message.Text, time.Now())
+			log.Printf("[%s to bot] %s", update.Message.From.UserName, update.Message.Text)
+
+			reply := t.processorManager.ProcessMessage(update.Message.Text, time.Unix(int64(update.Message.Date), 0))
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, *reply)
 			msg.ReplyToMessageID = update.Message.MessageID
 			msg.ParseMode = "Markdown"
+			log.Printf("[bot to %s] %s", update.Message.From.UserName, *reply)
 
 			t.bot.Send(msg)
 		}

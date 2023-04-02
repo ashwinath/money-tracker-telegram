@@ -117,7 +117,7 @@ func (m *ProcessorManager) processChunkAdd(chunk *Chunk, messageTime time.Time) 
 	}
 
 	returnString := fmt.Sprintf(
-		"Created Transaction ID: %d, Transaction: %+v",
+		"Created Transaction ID: %d\n%s",
 		t.ID,
 		t,
 	)

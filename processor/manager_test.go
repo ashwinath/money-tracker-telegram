@@ -43,7 +43,7 @@ func TestHelp(t *testing.T) {
 }
 
 func TestProcessChunk(t *testing.T) {
-	var idPattern = regexp.MustCompile(`^Created Transaction ID: (?P<txID>\d+).*$`)
+	var idPattern = regexp.MustCompile(`^Created Transaction ID: (?P<txID>\d+)$`)
 
 	err := database.RunTest(func(db *database.DB) {
 		m, err := NewManager(db)
@@ -57,7 +57,8 @@ func TestProcessChunk(t *testing.T) {
 		reply := m.processChunk(addChunk, time.Now())
 		assert.True(t, strings.HasPrefix(*reply, "Created Transaction ID:"))
 
-		match := idPattern.FindStringSubmatch(*reply)
+		s := strings.Split(*reply, "\n")
+		match := idPattern.FindStringSubmatch(s[0])
 		result := make(map[string]string)
 		for i, name := range idPattern.SubexpNames() {
 			if i != 0 && name != "" {

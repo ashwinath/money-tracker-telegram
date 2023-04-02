@@ -1,6 +1,9 @@
 package db
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type TransactionType string
 
@@ -18,4 +21,14 @@ type Transaction struct {
 	Type           TransactionType `gorm:"column:type"`
 	Classification string
 	Amount         float64
+}
+
+func (t *Transaction) String() string {
+	return fmt.Sprintf(
+		"Date: %s\nType: %s\nClassification: %s\nAmount:%f",
+		t.Date,
+		t.Type,
+		t.Classification,
+		t.Amount,
+	)
 }
