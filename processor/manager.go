@@ -135,7 +135,7 @@ func (m *ProcessorManager) processChunkDelete(chunk *Chunk, messageTime time.Tim
 	}
 
 	returnString := fmt.Sprintf(
-		"Deleted Transaction ID: %d, Transaction: %+v",
+		"Deleted Transaction ID: %d\n%s",
 		chunk.ID,
 		deletedTx,
 	)

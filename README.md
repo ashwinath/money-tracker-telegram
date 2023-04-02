@@ -33,12 +33,31 @@ housing | Amount spent on housing needs
 ### Adding a transaction
 
 User: `ADD <TYPE> <CLASSIFICATION> <PRICE (no $ sign)> <Optional date (will automatically fix to yyyy-mm-dd)>`
-Service returns: `Created Transaction ID: <ID>, Transaction: <transaction>`
+Service returns: ```
+Created Transaction ID: 5
+Date: 2023-04-02 14:14:48 +0800 +08
+Type: OWN
+Classification: hellowyellow
+Amount:123.200000
+```
 
 ### Deleting a transaction
 
 User: `DEL <ID>`
-Service returns: `Deleted Transaction ID: <ID>, Transaction: <transaction>`
+Service returns: ```
+Deleted Transaction ID: 5
+Date: 2023-04-02 14:14:48 +0800 +08
+Type: OWN
+Classification: hellowyellow
+Amount:123.200000
+```
+
+### Generating a report by month
+
+User: `GEN March 2023`
+Service returns: `Report for March 2023`
+
+TODO: Need to generate reimbursements, others and shared spending (this is separated, but I should combine this)
 
 ## Web scraping (internal network only)
 
