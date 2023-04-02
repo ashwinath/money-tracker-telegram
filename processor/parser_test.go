@@ -3,10 +3,21 @@ package processor
 import (
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/ashwinath/money-tracker-telegram/db"
 	"github.com/stretchr/testify/assert"
 )
+
+func parseDateForced(t *testing.T, dateString string) *time.Time {
+	loc, err := time.LoadLocation("Asia/Singapore")
+	assert.Nil(t, err)
+
+	parsed, err := time.ParseInLocation(time.DateOnly, dateString, loc)
+	assert.Nil(t, err)
+
+	return &parsed
+}
 
 func TestParser(t *testing.T) {
 	var tests = []struct {
@@ -89,6 +100,18 @@ func TestParser(t *testing.T) {
 				Type:           db.TypeOwn,
 				Classification: "computer and monitors",
 				Amount:         2010.0,
+			},
+			expectedError: nil,
+		},
+		{
+			name:       "Add shared with date",
+			testString: "Add shared dinner 12.5 2020-10-02",
+			expected: Chunk{
+				Instruction:    Add,
+				Type:           db.TypeShared,
+				Classification: "dinner",
+				Amount:         12.5,
+				Date:           parseDateForced(t, "2020-10-02"),
 			},
 			expectedError: nil,
 		},

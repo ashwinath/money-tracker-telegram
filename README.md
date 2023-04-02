@@ -32,7 +32,7 @@ housing | Amount spent on housing needs
 
 ### Adding a transaction
 
-User: `ADD <TYPE> <CLASSIFICATION> <PRICE (no $ sign)>`
+User: `ADD <TYPE> <CLASSIFICATION> <PRICE (no $ sign)> <Optional date (will automatically fix to yyyy-mm-dd)>`
 Service returns: `Created Transaction ID: <ID>, Transaction: <transaction>`
 
 ### Deleting a transaction

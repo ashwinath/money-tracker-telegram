@@ -21,12 +21,12 @@ func TestHelp(t *testing.T) {
 		{
 			name:           "help with no error",
 			err:            nil,
-			expectedLength: 278,
+			expectedLength: 315,
 		},
 		{
 			name:           "help with no error",
 			err:            errors.New("hello world"),
-			expectedLength: 291,
+			expectedLength: 328,
 		},
 	}
 	m, err := NewManager(nil)
@@ -48,11 +48,13 @@ func TestProcessChunk(t *testing.T) {
 	err := database.RunTest(func(db *database.DB) {
 		m, err := NewManager(db)
 		assert.Nil(t, err)
+		now := time.Now()
 		addChunk := &Chunk{
 			Instruction:    Add,
 			Type:           database.TypeOwn,
 			Classification: "hello",
 			Amount:         100.2,
+			Date:           &now,
 		}
 		reply := m.processChunk(addChunk, time.Now())
 		assert.True(t, strings.HasPrefix(*reply, "Created Transaction ID:"))

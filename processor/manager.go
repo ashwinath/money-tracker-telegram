@@ -25,7 +25,7 @@ _Deleting a transaction_
 User: {{ .UserDelCommandHelp }}
 Service returns: {{ .UserDelResultHelp }}`
 
-const UserAddCommandHelp = "`ADD <TYPE> <CLASSIFICATION> <PRICE (no $ sign)>`"
+const UserAddCommandHelp = "`ADD <TYPE> <CLASSIFICATION> <PRICE (no $ sign)> <Optional date in yyyy-mm-dd format>`"
 const UserAddResultHelp = "`Created Transaction ID: <ID>, Transaction: <transaction>`"
 const UserDelCommandHelp = "`DEL <ID>`"
 const UserDelResultHelp = "`Deleted Transaction ID: <ID>, Transaction: <transaction>`"
@@ -109,6 +109,10 @@ func (m *ProcessorManager) processChunkAdd(chunk *Chunk, messageTime time.Time) 
 		Type:           chunk.Type,
 		Classification: chunk.Classification,
 		Amount:         chunk.Amount,
+	}
+
+	if chunk.Date != nil {
+		t.Date = *chunk.Date
 	}
 
 	t, err := m.db.InsertTransaction(t)

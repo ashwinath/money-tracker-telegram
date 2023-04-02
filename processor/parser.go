@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/ashwinath/money-tracker-telegram/db"
 )
@@ -39,6 +40,7 @@ type Chunk struct {
 	Classification string
 	Amount         float64
 	ID             uint
+	Date           *time.Time
 }
 
 type parser struct {
@@ -90,6 +92,16 @@ func (p *parser) Parse() (*Chunk, error) {
 			return nil, p.wrapError(err)
 		}
 		chunk.Amount = *amount
+
+		date, err := p.date()
+		if err != nil {
+			return nil, p.wrapError(err)
+		}
+		if date != nil {
+			// Date is optional
+			chunk.Date = date
+		}
+
 	case Delete:
 		id, err := p.id()
 		if err != nil {
@@ -248,4 +260,24 @@ func (p *parser) id() (*uint, error) {
 	id := uint(idInt)
 
 	return &id, nil
+}
+
+func (p *parser) date() (*time.Time, error) {
+	token := p.next()
+	if token == nil {
+		// Date is optional
+		return nil, nil
+	}
+
+	loc, err := time.LoadLocation("Asia/Singapore")
+	if err != nil {
+		return nil, err
+	}
+
+	parsed, err := time.ParseInLocation(time.DateOnly, *token, loc)
+	if err != nil {
+		return nil, err
+	}
+
+	return &parsed, nil
 }
