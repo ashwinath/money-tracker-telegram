@@ -19,6 +19,7 @@ const (
 	Add Instruction = iota
 	Delete
 	Help
+	Generate
 	NoOp
 )
 
@@ -26,21 +27,33 @@ const (
 	errorFormatWrappedToUser      = "Error: %s, Message: %s"
 	errorFormatInstructionToken   = "could not parse instruction token: %s"
 	errorFormatTypeToken          = "unable to parse type: %s"
-	errorFormatAmountToken        = "unable to parse type: %s"
+	errorFormatAmountToken        = "unable to parse amount: %s"
+	errorFormatYearToken          = "unable to parse year: %s"
+	errorFormatYearOutOfRange     = "year out of range (1970 - 2200 allowed): %d"
+	errorFormatMonthToken         = "unable to parse month: %s"
 	errorEmptyClassificationToken = "empty classification token"
 	errorEmptyTypeToken           = "empty type token"
 	errorEmptyAmountToken         = "empty amount token"
 	errorEmptyInstructionToken    = "empty instruction token"
 	errorEmptyIDToken             = "empty ID token"
+	errorEmptyMonthToken          = "empty month token"
+	errorEmptyYearToken           = "empty year token"
 )
 
 type Chunk struct {
-	Instruction    Instruction
+	Instruction Instruction
+
+	// For type Add
 	Type           db.TransactionType
 	Classification string
 	Amount         float64
-	ID             uint
 	Date           *time.Time
+
+	// For type Delete
+	ID uint
+
+	// For type Generate
+	StartDate *time.Time
 }
 
 type parser struct {
@@ -108,6 +121,12 @@ func (p *parser) Parse() (*Chunk, error) {
 			return nil, p.wrapError(err)
 		}
 		chunk.ID = *id
+	case Generate:
+		startDate, err := p.dateYear()
+		if err != nil {
+			return nil, p.wrapError(err)
+		}
+		chunk.StartDate = startDate
 	case Help:
 		// Do nothing
 	}
@@ -155,6 +174,8 @@ func (p *parser) instruction() (Instruction, error) {
 		return Delete, nil
 	case "HELP":
 		return Help, nil
+	case "GEN":
+		return Generate, nil
 	default:
 		return NoOp, fmt.Errorf(errorFormatInstructionToken, *token)
 	}
@@ -280,4 +301,76 @@ func (p *parser) date() (*time.Time, error) {
 	}
 
 	return &parsed, nil
+}
+
+func (p *parser) dateYear() (*time.Time, error) {
+	// Month
+	token := p.next()
+	if token == nil {
+		return nil, errors.New(errorEmptyMonthToken)
+	}
+
+	month, err := parseMonth(*token)
+	if err != nil {
+		return nil, err
+	}
+
+	// Year
+	token = p.next()
+	if token == nil {
+		return nil, errors.New(errorEmptyYearToken)
+	}
+
+	year, err := strconv.Atoi(*token)
+	if err != nil {
+		return nil, fmt.Errorf(errorFormatYearToken, *token)
+	}
+
+	// I'm making a decision to only support a short period of time
+	if year < 1970 || year > 2200 {
+		return nil, fmt.Errorf(errorFormatYearOutOfRange, year)
+	}
+
+	loc, err := time.LoadLocation("Asia/Singapore")
+	if err != nil {
+		return nil, err
+	}
+
+	startDate, err := time.ParseInLocation(time.DateOnly, fmt.Sprintf("%d-%02d-01", year, month), loc)
+	if err != nil {
+		return nil, err
+	}
+
+	return &startDate, nil
+}
+
+func parseMonth(monthString string) (int, error) {
+	switch monthUpper := strings.ToUpper(monthString); monthUpper {
+	case "JAN", "JANUARY":
+		return 1, nil
+	case "FEB", "FEBURARY":
+		return 2, nil
+	case "MAR", "MARCH":
+		return 3, nil
+	case "APR", "APRIL":
+		return 4, nil
+	case "MAY":
+		return 5, nil
+	case "JUN", "JUNE":
+		return 6, nil
+	case "JUL", "JULY":
+		return 7, nil
+	case "AUG", "AUGUST":
+		return 8, nil
+	case "SEP", "SEPTEMBER":
+		return 9, nil
+	case "OCT", "OCTOBER":
+		return 10, nil
+	case "NOV", "NOVEMBER":
+		return 11, nil
+	case "DEC", "DECEMBER":
+		return 12, nil
+	}
+
+	return -1, fmt.Errorf(errorFormatMonthToken, monthString)
 }

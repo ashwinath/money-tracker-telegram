@@ -133,6 +133,15 @@ func TestParser(t *testing.T) {
 			expectedError: nil,
 		},
 		{
+			name:       "Generate",
+			testString: "Gen March 2020",
+			expected: Chunk{
+				Instruction: Generate,
+				StartDate:   parseDateForced(t, "2020-03-01"),
+			},
+			expectedError: nil,
+		},
+		{
 			name:          "wrong instruction",
 			testString:    "update own computer and monitors 2010",
 			expected:      Chunk{},
@@ -197,6 +206,36 @@ func TestParser(t *testing.T) {
 			testString:    "Del you",
 			expected:      Chunk{},
 			expectedError: errors.New("Error: strconv.Atoi: parsing \"you\": invalid syntax, Message: Del you"),
+		},
+		{
+			name:          "generate year empty",
+			testString:    "Gen March",
+			expected:      Chunk{},
+			expectedError: errors.New("Error: empty year token, Message: Gen March"),
+		},
+		{
+			name:          "generate year out of range (above 2200)",
+			testString:    "Gen March 2201",
+			expected:      Chunk{},
+			expectedError: errors.New("Error: year out of range (1970 - 2200 allowed): 2201, Message: Gen March 2201"),
+		},
+		{
+			name:          "generate year out of range (before 1970)",
+			testString:    "Gen March 1969",
+			expected:      Chunk{},
+			expectedError: errors.New("Error: year out of range (1970 - 2200 allowed): 1969, Message: Gen March 1969"),
+		},
+		{
+			name:          "generate month empty",
+			testString:    "Gen",
+			expected:      Chunk{},
+			expectedError: errors.New("Error: empty month token, Message: Gen"),
+		},
+		{
+			name:          "generate month no such month",
+			testString:    "Gen Januahree 2020",
+			expected:      Chunk{},
+			expectedError: errors.New("Error: unable to parse month: Januahree, Message: Gen Januahree 2020"),
 		},
 	}
 	for _, tt := range tests {
