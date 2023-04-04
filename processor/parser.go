@@ -24,20 +24,21 @@ const (
 )
 
 const (
-	errorFormatWrappedToUser      = "Error: %s, Message: %s"
-	errorFormatInstructionToken   = "could not parse instruction token: %s"
-	errorFormatTypeToken          = "unable to parse type: %s"
-	errorFormatAmountToken        = "unable to parse amount: %s"
-	errorFormatYearToken          = "unable to parse year: %s"
-	errorFormatYearOutOfRange     = "year out of range (1970 - 2200 allowed): %d"
-	errorFormatMonthToken         = "unable to parse month: %s"
-	errorEmptyClassificationToken = "empty classification token"
-	errorEmptyTypeToken           = "empty type token"
-	errorEmptyAmountToken         = "empty amount token"
-	errorEmptyInstructionToken    = "empty instruction token"
-	errorEmptyIDToken             = "empty ID token"
-	errorEmptyMonthToken          = "empty month token"
-	errorEmptyYearToken           = "empty year token"
+	errorFormatWrappedToUser                   = "Error: %s, Message: %s"
+	errorFormatInstructionToken                = "could not parse instruction token: %s"
+	errorFormatTypeToken                       = "unable to parse type: %s"
+	errorFormatAmountToken                     = "unable to parse amount: %s"
+	errorFormatYearToken                       = "unable to parse year: %s"
+	errorFormatYearOutOfRange                  = "year out of range (1970 - 2200 allowed): %d"
+	errorFormatMonthToken                      = "unable to parse month: %s"
+	errorSuggestAMoreSuitableSpecialSharedType = "did you mean special shared?"
+	errorEmptyClassificationToken              = "empty classification token"
+	errorEmptyTypeToken                        = "empty type token"
+	errorEmptyAmountToken                      = "empty amount token"
+	errorEmptyInstructionToken                 = "empty instruction token"
+	errorEmptyIDToken                          = "empty ID token"
+	errorEmptyMonthToken                       = "empty month token"
+	errorEmptyYearToken                        = "empty year token"
 )
 
 type Chunk struct {
@@ -192,6 +193,10 @@ func (p *parser) transactionType() (db.TransactionType, error) {
 		if strings.ToUpper(*p.peekCurrent()) == "REIM" {
 			p.next()
 			return db.TypeSharedReimburse, nil
+		}
+		if strings.ToUpper(*p.peekCurrent()) == "SPECIAL" {
+			// Courtesy message that special before shared.
+			return TypeNone, errors.New(errorSuggestAMoreSuitableSpecialSharedType)
 		}
 		return db.TypeShared, nil
 	case "SPECIAL":

@@ -2,6 +2,7 @@ package processor
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -236,6 +237,12 @@ func TestParser(t *testing.T) {
 			testString:    "Gen Januahree 2020",
 			expected:      Chunk{},
 			expectedError: errors.New("Error: unable to parse month: Januahree, Message: Gen Januahree 2020"),
+		},
+		{
+			name:          "Add shared special (order flipped)",
+			testString:    "Add shared special washing machine 810.5",
+			expected:      Chunk{},
+			expectedError: fmt.Errorf("Error: %s, Message: Add shared special washing machine 810.5", errorSuggestAMoreSuitableSpecialSharedType),
 		},
 	}
 	for _, tt := range tests {
