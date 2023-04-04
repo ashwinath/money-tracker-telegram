@@ -12,7 +12,7 @@ podAnnotations: {}
 # -- Resources requests and limits for the application
 resources: {}
 
-config: |
+config:
   # -- Telegram API key, must be filled in.
   apiKey: <telegram bot API key here>
   # -- Telegram username handle, must be filled in.

@@ -20,6 +20,12 @@ spec:
       labels:
         {{- include "money-tracker-telegram.selectorLabels" . | nindent 8 }}
     spec:
+      initContainers:
+      - name: check-db-ready
+        image: postgres:15.2
+        command: ['sh', '-c', 
+          'until pg_isready -h {{ .Release.Name}}-postgresql -p 5432; 
+          do echo waiting for database; sleep 2; done;']
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"

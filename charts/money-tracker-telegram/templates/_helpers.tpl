@@ -53,7 +53,10 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{/*
 Set extra configurations for the database to be autowired
 */}}
-{{- define "money-tracker-telegram.dbConfig" -}}
+{{- define "money-tracker-telegram.config" -}}
+apiKey: {{ .Values.config.apiKey }}
+allowedUser: {{ .Values.config.allowedUser }}
+debug: {{ .Values.debug }}
 dbConfig:
   host: {{ .Release.Name }}-postgresql
   user: postgres

@@ -4,5 +4,4 @@ metadata:
   name: {{ .Release.Name }}-config
 data:
   config.yaml: |-
-{{ .Values.config | indent 4 }}
-{{ include "money-tracker-telegram.dbConfig" . | indent 4 }}
+{{ include "money-tracker-telegram.config" . | indent 4 }}
