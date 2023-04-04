@@ -1,0 +1,34 @@
+image:
+  # -- Respository of the image.
+  repository: ghcr.io/ashwinath/money-tracker-telegram
+  # -- Image pull policy in Kubernetes
+  pullPolicy: Always
+    # -- Override this value for the desired image tag
+  tag: latest
+
+nameOverride: ""
+fullnameOverride: ""
+podAnnotations: {}
+# -- Resources requests and limits for the application
+resources: {}
+
+config: |
+  # -- Telegram API key, must be filled in.
+  apiKey: <telegram bot API key here>
+  # -- Telegram username handle, must be filled in.
+  allowedUser: <your telegram username>
+  # -- Enable debug logging
+  debug: false
+
+postgresql:
+  # -- Resources requests and limits for the database
+  resources: {}
+  persistence:
+    # -- Persist Postgresql data in a Persistent Volume Claim 
+    enabled: true
+  # -- Database name for Postgresql database
+  postgresqlDatabase: postgres
+  # -- Username for postgresql database
+  postgresqlUsername: postgres
+  # -- Password for postgresql database, highly recommended to change this value
+  postgresqlPassword: password

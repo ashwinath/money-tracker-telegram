@@ -1,3 +1,6 @@
+commit=$(shell git rev-parse HEAD)
+all: build push
+
 .PHONY: test
 test:
 	@go clean -testcache
@@ -14,9 +17,9 @@ db:
 
 .PHONY: build
 build:
-	docker build -t $(REGISTRY)/financials:$(commit) -t $(REGISTRY)/financials:latest .
+	docker build -t $(REGISTRY)/money-tracker-telegram:$(commit) -t $(REGISTRY)/money-tracker-telegram:latest .
 
 .PHONY: push
 push:
-	docker push $(REGISTRY)/financials:$(commit)
-	docker push $(REGISTRY)/financials:latest
+	docker push $(REGISTRY)/money-tracker-telegram:$(commit)
+	docker push $(REGISTRY)/money-tracker-telegram:latest
