@@ -20,6 +20,7 @@ special shared reim | Amount to be reimbursed, usually paying first using CC and
 shared | Amount that is shared but other party had paid first
 special shared | Amount that is shared but other party had paid first and it's a one off thing
 own | Regular type of spending for ownself.
+special own | Amount that is spent for myself but special events.
 
 ### Classification
 

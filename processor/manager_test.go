@@ -21,12 +21,12 @@ func TestHelp(t *testing.T) {
 		{
 			name:           "help with no error",
 			err:            nil,
-			expectedLength: 639,
+			expectedLength: 653,
 		},
 		{
 			name:           "help with no error",
 			err:            errors.New("hello world"),
-			expectedLength: 652,
+			expectedLength: 666,
 		},
 	}
 	m, err := NewManager(nil)

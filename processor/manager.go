@@ -23,6 +23,7 @@ Classification Types:
 - SHARED
 - SPECIAL SHARED
 - OWN
+- SPECIAL OWN
 
 _Adding a transaction_
 
