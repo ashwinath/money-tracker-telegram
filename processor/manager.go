@@ -16,6 +16,14 @@ const HelpMessageTemplate = `
 {{ .Error }}
 {{ end }}
 
+Classification Types:
+- REIM
+- SHARED REIM
+- SPECIAL SHARED REIM
+- SHARED
+- SPECIAL SHARED
+- OWN
+
 _Adding a transaction_
 
 User: {{ .UserAddCommandHelp }}
@@ -24,12 +32,27 @@ Service returns: {{ .UserAddResultHelp }}
 _Deleting a transaction_
 
 User: {{ .UserDelCommandHelp }}
-Service returns: {{ .UserDelResultHelp }}`
+Service returns: {{ .UserDelResultHelp }}
+
+_Generating a monthly report_
+
+User: {{ .UserGenCommandHelp }}
+Service returns: {{ .UserGenResultHelp }}
+`
 
 const UserAddCommandHelp = "`ADD <TYPE> <CLASSIFICATION> <PRICE (no $ sign)> <Optional date in yyyy-mm-dd format>`"
 const UserAddResultHelp = "`Created Transaction ID: <ID>, Transaction: <transaction>`"
+
 const UserDelCommandHelp = "`DEL <ID>`"
 const UserDelResultHelp = "`Deleted Transaction ID: <ID>, Transaction: <transaction>`"
+
+const UserGenCommandHelp = "`GEN <Month> <Year>`"
+const UserGenResultHelp = "```\n" +
+	"---expenses.csv---\n" +
+	"<Date>,Others,<Amount>\n" +
+	"<Date>,Reimbursement,<Amount>\n" +
+	"---shared_expenses.csv---\n" +
+	"<Date>,<(Special):Classification>,<Amount>\n```"
 
 const oneMonth = 1
 const databaseQueryErrorFormat = "Could not query database, error: %s"
@@ -57,6 +80,8 @@ type UserHelp struct {
 	UserAddResultHelp  string
 	UserDelCommandHelp string
 	UserDelResultHelp  string
+	UserGenCommandHelp string
+	UserGenResultHelp  string
 }
 
 func (m *ProcessorManager) showHelp(err error) *string {
@@ -71,6 +96,8 @@ func (m *ProcessorManager) showHelp(err error) *string {
 		UserAddResultHelp:  UserAddResultHelp,
 		UserDelCommandHelp: UserDelCommandHelp,
 		UserDelResultHelp:  UserDelResultHelp,
+		UserGenCommandHelp: UserGenCommandHelp,
+		UserGenResultHelp:  UserGenResultHelp,
 	}
 
 	buf := &bytes.Buffer{}
@@ -127,7 +154,7 @@ func (m *ProcessorManager) processChunkAdd(chunk *Chunk, messageTime time.Time) 
 	}
 
 	returnString := fmt.Sprintf(
-		"Created Transaction ID: %d\n%s",
+		"```\nCreated Transaction ID: %d\n%s```",
 		t.ID,
 		t,
 	)
@@ -141,7 +168,7 @@ func (m *ProcessorManager) processChunkDelete(chunk *Chunk, messageTime time.Tim
 	}
 
 	returnString := fmt.Sprintf(
-		"Deleted Transaction ID: %d\n%s",
+		"```\nDeleted Transaction ID: %d\n%s```",
 		chunk.ID,
 		deletedTx,
 	)
@@ -207,14 +234,13 @@ func (m *ProcessorManager) processChunkGenerate(chunk *Chunk) *string {
 	)
 
 	// other shared spending
-	resStrings = append(resStrings, "shared_expenses.csv")
+	resStrings = append(resStrings, "---shared_expenses.csv---")
 	for _, tx := range sharedResult.Result {
-		var typeBuilder []string
+		type_ := ""
 		if strings.Contains(string(tx.Type), "SPECIAL") {
-			typeBuilder = append(typeBuilder, "Special:")
+			type_ += "Special:"
 		}
-		typeBuilder = append(typeBuilder, tx.Classification)
-		type_ := strings.Join(typeBuilder, "")
+		type_ += string(tx.Classification)
 
 		date := tx.Date
 		amount := tx.Amount

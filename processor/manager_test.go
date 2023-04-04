@@ -21,12 +21,12 @@ func TestHelp(t *testing.T) {
 		{
 			name:           "help with no error",
 			err:            nil,
-			expectedLength: 315,
+			expectedLength: 639,
 		},
 		{
 			name:           "help with no error",
 			err:            errors.New("hello world"),
-			expectedLength: 328,
+			expectedLength: 652,
 		},
 	}
 	m, err := NewManager(nil)
@@ -57,10 +57,10 @@ func TestProcessChunk(t *testing.T) {
 			Date:           &now,
 		}
 		reply := m.processChunk(addChunk, time.Now())
-		assert.True(t, strings.HasPrefix(*reply, "Created Transaction ID:"))
+		assert.True(t, strings.HasPrefix(*reply, "```\nCreated Transaction ID:"))
 
 		s := strings.Split(*reply, "\n")
-		match := idPattern.FindStringSubmatch(s[0])
+		match := idPattern.FindStringSubmatch(s[1])
 		result := make(map[string]string)
 		for i, name := range idPattern.SubexpNames() {
 			if i != 0 && name != "" {
@@ -76,7 +76,7 @@ func TestProcessChunk(t *testing.T) {
 			ID:          uint(id),
 		}
 		deleteReply := m.processChunk(deleteChunk, time.Now())
-		assert.True(t, strings.HasPrefix(*deleteReply, "Deleted Transaction ID:"))
+		assert.True(t, strings.HasPrefix(*deleteReply, "```\nDeleted Transaction ID:"))
 	})
 	assert.Nil(t, err)
 }
