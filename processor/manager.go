@@ -226,11 +226,11 @@ func (m *ProcessorManager) processChunkGenerate(chunk *Chunk) *string {
 	resStrings = append(resStrings, "---expenses.csv---")
 	resStrings = append(
 		resStrings,
-		fmt.Sprintf("%s,Others,%f", chunk.StartDate.Format(time.DateOnly), *othersResult.Result),
+		fmt.Sprintf("%s,Others,%.2f", chunk.StartDate.Format(time.DateOnly), *othersResult.Result),
 	)
 	resStrings = append(
 		resStrings,
-		fmt.Sprintf("%s,Reimbursement,%f", chunk.StartDate.Format(time.DateOnly), *reimResult.Result*-1),
+		fmt.Sprintf("%s,Reimbursement,%.2f", chunk.StartDate.Format(time.DateOnly), *reimResult.Result*-1),
 	)
 
 	// other shared spending
@@ -246,7 +246,7 @@ func (m *ProcessorManager) processChunkGenerate(chunk *Chunk) *string {
 		amount := tx.Amount
 		resStrings = append(
 			resStrings,
-			fmt.Sprintf("%s,%s,%f", date.Format(time.DateOnly), type_, amount),
+			fmt.Sprintf("%s,%s,%.2f", date.Format(time.DateOnly), type_, amount),
 		)
 	}
 

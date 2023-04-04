@@ -80,3 +80,37 @@ func TestProcessChunk(t *testing.T) {
 	})
 	assert.Nil(t, err)
 }
+
+func TestProcessChunkWithGenerate(t *testing.T) {
+	err := database.RunTest(func(db *database.DB) {
+		m, err := NewManager(db)
+		assert.Nil(t, err)
+		addChunk := &Chunk{
+			Instruction:    Add,
+			Type:           database.TypeOwn,
+			Classification: "dinner",
+			Amount:         120.2,
+			Date:           parseDateForced(t, "2023-04-01"),
+		}
+		reply := m.processChunk(addChunk, time.Now())
+		assert.True(t, strings.HasPrefix(*reply, "```\nCreated Transaction ID:"))
+
+		addChunk = &Chunk{
+			Instruction:    Add,
+			Type:           database.TypeSharedReimburse,
+			Classification: "air tickets",
+			Amount:         2000.2,
+			Date:           parseDateForced(t, "2023-04-02"),
+		}
+		reply = m.processChunk(addChunk, time.Now())
+		assert.True(t, strings.HasPrefix(*reply, "```\nCreated Transaction ID:"))
+
+		genChunk := &Chunk{
+			Instruction: Generate,
+			StartDate:   parseDateForced(t, "2023-04-01"),
+		}
+		reply = m.processChunk(genChunk, time.Now())
+		assert.Equal(t, "```\n---expenses.csv---\n2023-04-01,Others,120.20\n2023-04-01,Reimbursement,-2000.20\n---shared_expenses.csv---\n2023-04-02,air tickets,2000.20\n```", *reply)
+	})
+	assert.Nil(t, err)
+}
