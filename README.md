@@ -54,10 +54,14 @@ Amount:123.200000
 
 ### Generating a report by month
 
-User: `GEN March 2023`
-Service returns: `Report for March 2023`
-
-TODO: Need to generate reimbursements, others and shared spending (this is separated, but I should combine this)
+User: `GEN APR 2023`
+Service returns: ```
+---expenses.csv---
+2023-04-30,Others,251.00
+2023-04-30,Reimbursement,-203.00
+---shared_expenses.csv---
+2023-04-03,table,223.20
+2023-04-04,Special:furniture,200.20```
 
 ## Web scraping (internal network only)
 
