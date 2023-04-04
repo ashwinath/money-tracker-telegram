@@ -90,7 +90,7 @@ func TestProcessChunkWithGenerate(t *testing.T) {
 			Type:           database.TypeOwn,
 			Classification: "dinner",
 			Amount:         120.2,
-			Date:           parseDateForced(t, "2023-04-01"),
+			Date:           parseDateForced(t, "2023-04-21"),
 		}
 		reply := m.processChunk(addChunk, time.Now())
 		assert.True(t, strings.HasPrefix(*reply, "```\nCreated Transaction ID:"))
@@ -110,7 +110,7 @@ func TestProcessChunkWithGenerate(t *testing.T) {
 			StartDate:   parseDateForced(t, "2023-04-01"),
 		}
 		reply = m.processChunk(genChunk, time.Now())
-		assert.Equal(t, "```\n---expenses.csv---\n2023-04-01,Others,120.20\n2023-04-01,Reimbursement,-2000.20\n---shared_expenses.csv---\n2023-04-02,air tickets,2000.20\n```", *reply)
+		assert.Equal(t, "```\n---expenses.csv---\n2023-04-30,Others,120.20\n2023-04-30,Reimbursement,-2000.20\n---shared_expenses.csv---\n2023-04-02,air tickets,2000.20\n```", *reply)
 	})
 	assert.Nil(t, err)
 }

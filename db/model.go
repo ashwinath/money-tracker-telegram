@@ -17,10 +17,12 @@ const TypeSpecialOwn TransactionType = "SPECIAL_OWN"
 
 type Transaction struct {
 	ID             uint            `gorm:"primaryKey"`
-	Date           time.Time       `gorm:"index"`
+	Date           time.Time       `gorm:"type:timestamp;index"`
 	Type           TransactionType `gorm:"column:type"`
 	Classification string
 	Amount         float64
+	CreatedAt      time.Time `gorm:"type:timestamp"`
+	UpdatedAt      time.Time `gorm:"type:timestamp"`
 }
 
 func (t *Transaction) String() string {

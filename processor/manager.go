@@ -222,15 +222,16 @@ func (m *ProcessorManager) processChunkGenerate(chunk *Chunk) *string {
 	var resStrings []string
 
 	// others + reimbursements
+	endDateOfMonth := endDate.AddDate(0, 0, -1).Format(time.DateOnly)
 	resStrings = append(resStrings, "```")
 	resStrings = append(resStrings, "---expenses.csv---")
 	resStrings = append(
 		resStrings,
-		fmt.Sprintf("%s,Others,%.2f", chunk.StartDate.Format(time.DateOnly), *othersResult.Result),
+		fmt.Sprintf("%s,Others,%.2f", endDateOfMonth, *othersResult.Result),
 	)
 	resStrings = append(
 		resStrings,
-		fmt.Sprintf("%s,Reimbursement,%.2f", chunk.StartDate.Format(time.DateOnly), *reimResult.Result*-1),
+		fmt.Sprintf("%s,Reimbursement,%.2f", endDateOfMonth, *reimResult.Result*-1),
 	)
 
 	// other shared spending

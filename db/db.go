@@ -6,6 +6,7 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type DB struct {
@@ -23,7 +24,13 @@ func New(host, user, password, dbName string, port uint) (*DB, error) {
 		port,
 	)
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+		NowFunc: func() time.Time {
+			ti, _ := time.LoadLocation("Asia/Singapore")
+			return time.Now().In(ti)
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
