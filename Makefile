@@ -1,3 +1,4 @@
+.PHONY: test
 test:
 	@go clean -testcache
 	@go test -cover -race ./...
@@ -10,3 +11,12 @@ db:
 		--name money-tracker-telegram \
 		postgres:15-alpine
 	@timeout 30 bash -c "until docker exec money-tracker-telegram pg_isready; do sleep 2; done"
+
+.PHONY: build
+build:
+	docker build -t $(REGISTRY)/financials:$(commit) -t $(REGISTRY)/financials:latest .
+
+.PHONY: push
+push:
+	docker push $(REGISTRY)/financials:$(commit)
+	docker push $(REGISTRY)/financials:latest
