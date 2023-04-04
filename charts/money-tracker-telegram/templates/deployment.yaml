@@ -31,7 +31,7 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
           - name: config
-            mountPath: /etc/config/config.yaml
+            mountPath: /etc/config/
       volumes:
       - name: config
         configMap:

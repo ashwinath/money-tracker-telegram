@@ -56,8 +56,8 @@ Set extra configurations for the database to be autowired
 {{- define "money-tracker-telegram.dbConfig" -}}
 dbConfig:
   host: {{ .Release.Name }}-postgresql
-  user: {{ .Values.postgresql.postgresqlUsername }}
-  password: {{ .Values.postgresql.postgresqlPassword }}
-  dbName: {{ .Values.postgresql.postgresqlDatabase }}
+  user: postgres
+  password: {{ .Values.postgresql.auth.postgresPassword }}
+  dbName: postgres
   port: 5432
 {{- end }}

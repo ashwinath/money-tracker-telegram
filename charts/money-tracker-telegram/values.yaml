@@ -21,14 +21,10 @@ config: |
   debug: false
 
 postgresql:
-  # -- Resources requests and limits for the database
-  resources: {}
-  persistence:
-    # -- Persist Postgresql data in a Persistent Volume Claim 
-    enabled: true
-  # -- Database name for Postgresql database
-  postgresqlDatabase: postgres
-  # -- Username for postgresql database
-  postgresqlUsername: postgres
-  # -- Password for postgresql database, highly recommended to change this value
-  postgresqlPassword: password
+  primary:
+    persistence:
+      # -- Persist Postgresql data in a Persistent Volume Claim 
+      enabled: true
+  auth:
+    # -- Password for postgresql database, highly recommended to change this value
+    postgresPassword: password
