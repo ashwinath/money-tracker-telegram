@@ -21,6 +21,10 @@ shared | Amount that is shared but other party had paid first
 special shared | Amount that is shared but other party had paid first and it's a one off thing
 own | Regular type of spending for ownself.
 special own | Amount that is spent for myself but special events.
+Tithe | Amount given to parents
+Credit Card | Amount paid using credit card
+Tax | Amount paid to the tax man
+Insurance | Amount spent for insurance
 
 ### Classification
 
@@ -56,13 +60,24 @@ Amount:123.200000
 ### Generating a report by month
 
 User: `GEN APR 2023`
-Service returns: ```
+Service returns: 
+```
 ---expenses.csv---
-2023-04-30,Others,251.00
-2023-04-30,Reimbursement,-203.00
+2023-04-30,Others,23.40
+2023-04-30,Reimbursement,-46.80
+2023-04-30,Insurance,200.54
+2023-04-30,Tithe,200.32
+2023-04-30,Credit Card,23.40
+2023-04-30,Tax,23.40
 ---shared_expenses.csv---
 2023-04-03,table,223.20
-2023-04-04,Special:furniture,200.20```
+2023-04-04,Special:furniture,200.20
+```
+
+## Feature wishlist
+
+Adding the following expense types.
+
 
 ## Web scraping (internal network only)
 

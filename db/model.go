@@ -14,6 +14,10 @@ const TypeSpecialShared TransactionType = "SPECIAL_SHARED"
 const TypeSpecialSharedReimburse TransactionType = "SPECIAL_SHARED_REIM"
 const TypeOwn TransactionType = "OWN"
 const TypeSpecialOwn TransactionType = "SPECIAL_OWN"
+const TypeCreditCard TransactionType = "CREDIT CARD"
+const TypeInsurance TransactionType = "INSURANCE"
+const TypeTithe TransactionType = "TITHE"
+const TypeTax TransactionType = "TAX"
 
 type Transaction struct {
 	ID             uint            `gorm:"primaryKey"`
@@ -26,6 +30,15 @@ type Transaction struct {
 }
 
 func (t *Transaction) String() string {
+	if len(string(t.Classification)) == 0 {
+		return fmt.Sprintf(
+			"Date: %s\nType: %s\nAmount:%.2f",
+			t.Date,
+			t.Type,
+			t.Amount,
+		)
+	}
+
 	return fmt.Sprintf(
 		"Date: %s\nType: %s\nClassification: %s\nAmount:%.2f",
 		t.Date,

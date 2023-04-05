@@ -143,6 +143,47 @@ func TestParser(t *testing.T) {
 			expectedError: nil,
 		},
 		{
+			name:       "Add credit card",
+			testString: "Add cc 1003.52",
+			expected: Chunk{
+				Instruction: Add,
+				Type:        db.TypeCreditCard,
+				Amount:      1003.52,
+			},
+			expectedError: nil,
+		},
+		{
+			name:       "Add insurance",
+			testString: "Add insurance 200.32",
+			expected: Chunk{
+				Instruction: Add,
+				Type:        db.TypeInsurance,
+				Amount:      200.32,
+			},
+			expectedError: nil,
+		},
+		{
+			name:       "Add tithe",
+			testString: "Add tithe 500",
+			expected: Chunk{
+				Instruction: Add,
+				Type:        db.TypeTithe,
+				Amount:      500,
+			},
+			expectedError: nil,
+		},
+		{
+			name:       "Add tax",
+			testString: "Add tax 45 2023-03-23",
+			expected: Chunk{
+				Instruction: Add,
+				Type:        db.TypeTax,
+				Amount:      45,
+				Date:        parseDateForced(t, "2023-03-23"),
+			},
+			expectedError: nil,
+		},
+		{
 			name:          "wrong instruction",
 			testString:    "update own computer and monitors 2010",
 			expected:      Chunk{},

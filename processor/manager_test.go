@@ -21,12 +21,12 @@ func TestHelp(t *testing.T) {
 		{
 			name:           "help with no error",
 			err:            nil,
-			expectedLength: 653,
+			expectedLength: 866,
 		},
 		{
 			name:           "help with no error",
 			err:            errors.New("hello world"),
-			expectedLength: 666,
+			expectedLength: 879,
 		},
 	}
 	m, err := NewManager(nil)
@@ -105,12 +105,48 @@ func TestProcessChunkWithGenerate(t *testing.T) {
 		reply = m.processChunk(addChunk, time.Now())
 		assert.True(t, strings.HasPrefix(*reply, "```\nCreated Transaction ID:"))
 
+		addChunk = &Chunk{
+			Instruction: Add,
+			Type:        database.TypeTax,
+			Amount:      500.2,
+			Date:        parseDateForced(t, "2023-04-02"),
+		}
+		reply = m.processChunk(addChunk, time.Now())
+		assert.True(t, strings.HasPrefix(*reply, "```\nCreated Transaction ID:"))
+
+		addChunk = &Chunk{
+			Instruction: Add,
+			Type:        database.TypeTithe,
+			Amount:      200,
+			Date:        parseDateForced(t, "2023-04-02"),
+		}
+		reply = m.processChunk(addChunk, time.Now())
+		assert.True(t, strings.HasPrefix(*reply, "```\nCreated Transaction ID:"))
+
+		addChunk = &Chunk{
+			Instruction: Add,
+			Type:        database.TypeCreditCard,
+			Amount:      300,
+			Date:        parseDateForced(t, "2023-04-02"),
+		}
+		reply = m.processChunk(addChunk, time.Now())
+		assert.True(t, strings.HasPrefix(*reply, "```\nCreated Transaction ID:"))
+
+		addChunk = &Chunk{
+			Instruction: Add,
+			Type:        database.TypeInsurance,
+			Amount:      150,
+			Date:        parseDateForced(t, "2023-04-02"),
+		}
+		reply = m.processChunk(addChunk, time.Now())
+		assert.True(t, strings.HasPrefix(*reply, "```\nCreated Transaction ID:"))
+
 		genChunk := &Chunk{
 			Instruction: Generate,
 			StartDate:   parseDateForced(t, "2023-04-01"),
 		}
 		reply = m.processChunk(genChunk, time.Now())
-		assert.Equal(t, "```\n---expenses.csv---\n2023-04-30,Others,120.20\n2023-04-30,Reimbursement,-2000.20\n---shared_expenses.csv---\n2023-04-02,air tickets,2000.20\n```", *reply)
+		assert.Equal(t, "```\n---expenses.csv---\n2023-04-30,Others,120.20\n2023-04-30,Reimbursement,-2000.20\n2023-04-30,Tax,500.20\n2023-04-30,Tithe,200.00\n2023-04-30,Credit Card,300.00\n2023-04-30,Insurance,150.00\n---shared_expenses.csv---\n2023-04-02,air tickets,2000.20\n```", *reply)
 	})
 	assert.Nil(t, err)
 }

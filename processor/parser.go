@@ -41,6 +41,13 @@ const (
 	errorEmptyYearToken                        = "empty year token"
 )
 
+var typesWithoutClassification = map[db.TransactionType]struct{}{
+	db.TypeCreditCard: {},
+	db.TypeInsurance:  {},
+	db.TypeTithe:      {},
+	db.TypeTax:        {},
+}
+
 type Chunk struct {
 	Instruction Instruction
 
@@ -95,11 +102,13 @@ func (p *parser) Parse() (*Chunk, error) {
 		}
 		chunk.Type = transactionType
 
-		classification, err := p.classification()
-		if err != nil {
-			return nil, p.wrapError(err)
+		if _, ok := typesWithoutClassification[transactionType]; !ok {
+			classification, err := p.classification()
+			if err != nil {
+				return nil, p.wrapError(err)
+			}
+			chunk.Classification = *classification
 		}
-		chunk.Classification = *classification
 
 		amount, err := p.amount()
 		if err != nil {
@@ -189,6 +198,14 @@ func (p *parser) transactionType() (db.TransactionType, error) {
 	}
 
 	switch tokenUpper := strings.ToUpper(*token); tokenUpper {
+	case "CC":
+		return db.TypeCreditCard, nil
+	case "TAX":
+		return db.TypeTax, nil
+	case "TITHE":
+		return db.TypeTithe, nil
+	case "INSURANCE":
+		return db.TypeInsurance, nil
 	case "SHARED":
 		if strings.ToUpper(*p.peekCurrent()) == "REIM" {
 			p.next()

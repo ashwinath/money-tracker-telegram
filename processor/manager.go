@@ -30,6 +30,11 @@ _Adding a transaction_
 User: {{ .UserAddCommandHelp }}
 Service returns: {{ .UserAddResultHelp }}
 
+_Adding a transaction for tax/insurance/tithe/credit card_
+
+User: {{ .UserAddOthersCommandHelp }}
+Service returns: {{ .UserAddResultHelp }}
+
 _Deleting a transaction_
 
 User: {{ .UserDelCommandHelp }}
@@ -43,6 +48,8 @@ Service returns: {{ .UserGenResultHelp }}
 
 const UserAddCommandHelp = "`ADD <TYPE> <CLASSIFICATION> <PRICE (no $ sign)> <Optional date in yyyy-mm-dd format>`"
 const UserAddResultHelp = "`Created Transaction ID: <ID>, Transaction: <transaction>`"
+
+const UserAddOthersCommandHelp = "`ADD <TYPE> <PRICE (no $ sign)> <Optional date in yyyy-mm-dd format>`"
 
 const UserDelCommandHelp = "`DEL <ID>`"
 const UserDelResultHelp = "`Deleted Transaction ID: <ID>, Transaction: <transaction>`"
@@ -76,13 +83,14 @@ func NewManager(db *database.DB) (*ProcessorManager, error) {
 }
 
 type UserHelp struct {
-	Error              string
-	UserAddCommandHelp string
-	UserAddResultHelp  string
-	UserDelCommandHelp string
-	UserDelResultHelp  string
-	UserGenCommandHelp string
-	UserGenResultHelp  string
+	Error                    string
+	UserAddCommandHelp       string
+	UserAddResultHelp        string
+	UserDelCommandHelp       string
+	UserDelResultHelp        string
+	UserGenCommandHelp       string
+	UserGenResultHelp        string
+	UserAddOthersCommandHelp string
 }
 
 func (m *ProcessorManager) showHelp(err error) *string {
@@ -92,13 +100,14 @@ func (m *ProcessorManager) showHelp(err error) *string {
 	}
 
 	args := &UserHelp{
-		Error:              errString,
-		UserAddCommandHelp: UserAddCommandHelp,
-		UserAddResultHelp:  UserAddResultHelp,
-		UserDelCommandHelp: UserDelCommandHelp,
-		UserDelResultHelp:  UserDelResultHelp,
-		UserGenCommandHelp: UserGenCommandHelp,
-		UserGenResultHelp:  UserGenResultHelp,
+		Error:                    errString,
+		UserAddCommandHelp:       UserAddCommandHelp,
+		UserAddResultHelp:        UserAddResultHelp,
+		UserDelCommandHelp:       UserDelCommandHelp,
+		UserDelResultHelp:        UserDelResultHelp,
+		UserGenCommandHelp:       UserGenCommandHelp,
+		UserGenResultHelp:        UserGenResultHelp,
+		UserAddOthersCommandHelp: UserAddOthersCommandHelp,
 	}
 
 	buf := &bytes.Buffer{}
@@ -186,6 +195,7 @@ type AsyncTransactionResults struct {
 	Error  error
 }
 
+// TODO: Process new commands
 func (m *ProcessorManager) processChunkGenerate(chunk *Chunk) *string {
 	endDate := chunk.StartDate.AddDate(0, oneMonth, 0)
 
@@ -200,6 +210,10 @@ func (m *ProcessorManager) processChunkGenerate(chunk *Chunk) *string {
 	// Generate shared expenses (list of transactions)
 	sharedResultChannel := make(chan AsyncTransactionResults)
 	go m.querySharedTransactions(*chunk.StartDate, endDate, sharedResultChannel)
+
+	// Generate all misc expenses
+	miscResultChannel := make(chan AsyncTransactionResults)
+	go m.queryMiscTransactions(*chunk.StartDate, endDate, miscResultChannel)
 
 	othersResult := <-othersResultChannel
 	if othersResult.Error != nil {
@@ -219,6 +233,12 @@ func (m *ProcessorManager) processChunkGenerate(chunk *Chunk) *string {
 		return &err
 	}
 
+	miscResult := <-miscResultChannel
+	if miscResult.Error != nil {
+		err := fmt.Sprintf(databaseQueryErrorFormat, miscResult.Error)
+		return &err
+	}
+
 	// build the string
 	var resStrings []string
 
@@ -234,6 +254,17 @@ func (m *ProcessorManager) processChunkGenerate(chunk *Chunk) *string {
 		resStrings,
 		fmt.Sprintf("%s,Reimbursement,%.2f", endDateOfMonth, *reimResult.Result*-1),
 	)
+
+	// misc results
+	for _, result := range miscResult.Result {
+		res := fmt.Sprintf(
+			"%s,%s,%.2f",
+			endDateOfMonth,
+			strings.Title(strings.ToLower(string(result.Type))),
+			result.Amount,
+		)
+		resStrings = append(resStrings, res)
+	}
 
 	// other shared spending
 	resStrings = append(resStrings, "---shared_expenses.csv---")
@@ -302,6 +333,25 @@ func (m *ProcessorManager) querySharedTransactions(startDate, endDate time.Time,
 			db.TypeSpecialSharedReimburse,
 			db.TypeSpecialShared,
 			db.TypeShared,
+		},
+	}
+	sharedTransactions, err := m.db.QueryTransactionByOptions(sharedOption)
+	result <- AsyncTransactionResults{
+		Result: sharedTransactions,
+		Error:  err,
+	}
+}
+
+func (m *ProcessorManager) queryMiscTransactions(startDate, endDate time.Time, result chan<- AsyncTransactionResults) {
+	defer close(result)
+	sharedOption := &db.FindTransactionOptions{
+		StartDate: startDate,
+		EndDate:   endDate,
+		Types: []db.TransactionType{
+			db.TypeCreditCard,
+			db.TypeInsurance,
+			db.TypeTax,
+			db.TypeTithe,
 		},
 	}
 	sharedTransactions, err := m.db.QueryTransactionByOptions(sharedOption)
