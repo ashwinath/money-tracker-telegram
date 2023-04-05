@@ -32,7 +32,7 @@ type Transaction struct {
 func (t *Transaction) String() string {
 	if len(string(t.Classification)) == 0 {
 		return fmt.Sprintf(
-			"Date: %s\nType: %s\nAmount:%.2f",
+			"Date: %s\nType: %s\nAmount: %.2f",
 			t.Date,
 			t.Type,
 			t.Amount,
