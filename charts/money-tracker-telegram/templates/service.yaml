@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "money-tracker-telegram.fullname" . }}
+  labels:
+    {{- include "money-tracker-telegram.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "money-tracker-telegram.selectorLabels" . | nindent 4 }}

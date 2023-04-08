@@ -20,6 +20,9 @@ config:
   # -- Enable debug logging
   debug: false
 
+service:
+  port: 80
+
 postgresql:
   primary:
     persistence:

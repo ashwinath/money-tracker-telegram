@@ -38,6 +38,18 @@ spec:
           volumeMounts:
           - name: config
             mountPath: /etc/config/
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
       volumes:
       - name: config
         configMap:
