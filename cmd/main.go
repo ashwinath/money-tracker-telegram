@@ -8,6 +8,7 @@ import (
 	database "github.com/ashwinath/money-tracker-telegram/db"
 	"github.com/ashwinath/money-tracker-telegram/processor"
 	"github.com/ashwinath/money-tracker-telegram/telegram"
+	"github.com/ashwinath/money-tracker-telegram/webhandler"
 )
 
 func main() {
@@ -48,5 +49,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	t.Run()
+	// start telegram bot
+	go t.Run() // fire and forget
+
+	// start http server
+	handler := webhandler.NewDataDumpHandler(db)
+	handler.Serve(8080)
 }

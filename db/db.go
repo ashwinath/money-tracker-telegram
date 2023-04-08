@@ -120,3 +120,85 @@ func (d *DB) QueryTransactionByOptions(o *FindTransactionOptions) ([]Transaction
 
 	return transactions, nil
 }
+
+type AsyncAggregateResult struct {
+	Result *float64
+	Error  error
+}
+
+type AsyncTransactionResults struct {
+	Result []Transaction
+	Error  error
+}
+
+func (d *DB) QueryTypeOwnSum(startDate, endDate time.Time, result chan<- AsyncAggregateResult) {
+	defer close(result)
+	othersOption := &FindTransactionOptions{
+		StartDate: startDate,
+		EndDate:   endDate,
+		Types:     []TransactionType{TypeOwn},
+	}
+
+	othersTotal, err := d.AggregateTransactions(othersOption)
+	result <- AsyncAggregateResult{
+		Result: othersTotal,
+		Error:  err,
+	}
+}
+
+func (d *DB) QueryReimburseSum(startDate, endDate time.Time, result chan<- AsyncAggregateResult) {
+	defer close(result)
+	reimOption := &FindTransactionOptions{
+		StartDate: startDate,
+		EndDate:   endDate,
+		Types: []TransactionType{
+			TypeReimburse,
+			TypeSharedReimburse,
+			TypeSpecialSharedReimburse,
+		},
+	}
+
+	reimTotal, err := d.AggregateTransactions(reimOption)
+	result <- AsyncAggregateResult{
+		Result: reimTotal,
+		Error:  err,
+	}
+}
+
+func (d *DB) QuerySharedTransactions(startDate, endDate time.Time, result chan<- AsyncTransactionResults) {
+	defer close(result)
+	sharedOption := &FindTransactionOptions{
+		StartDate: startDate,
+		EndDate:   endDate,
+		Types: []TransactionType{
+			TypeSharedReimburse,
+			TypeSpecialSharedReimburse,
+			TypeSpecialShared,
+			TypeShared,
+		},
+	}
+	sharedTransactions, err := d.QueryTransactionByOptions(sharedOption)
+	result <- AsyncTransactionResults{
+		Result: sharedTransactions,
+		Error:  err,
+	}
+}
+
+func (d *DB) QueryMiscTransactions(startDate, endDate time.Time, result chan<- AsyncTransactionResults) {
+	defer close(result)
+	sharedOption := &FindTransactionOptions{
+		StartDate: startDate,
+		EndDate:   endDate,
+		Types: []TransactionType{
+			TypeCreditCard,
+			TypeInsurance,
+			TypeTax,
+			TypeTithe,
+		},
+	}
+	sharedTransactions, err := d.QueryTransactionByOptions(sharedOption)
+	result <- AsyncTransactionResults{
+		Result: sharedTransactions,
+		Error:  err,
+	}
+}

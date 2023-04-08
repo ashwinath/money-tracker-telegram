@@ -7,7 +7,6 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/ashwinath/money-tracker-telegram/db"
 	database "github.com/ashwinath/money-tracker-telegram/db"
 )
 
@@ -147,7 +146,7 @@ func (m *ProcessorManager) processChunk(chunk *Chunk, messageTime time.Time) *st
 }
 
 func (m *ProcessorManager) processChunkAdd(chunk *Chunk, messageTime time.Time) *string {
-	t := &db.Transaction{
+	t := &database.Transaction{
 		Date:           messageTime,
 		Type:           chunk.Type,
 		Classification: chunk.Classification,
@@ -185,35 +184,24 @@ func (m *ProcessorManager) processChunkDelete(chunk *Chunk, messageTime time.Tim
 	return &returnString
 }
 
-type AsyncAggregateResult struct {
-	Result *float64
-	Error  error
-}
-
-type AsyncTransactionResults struct {
-	Result []db.Transaction
-	Error  error
-}
-
-// TODO: Process new commands
 func (m *ProcessorManager) processChunkGenerate(chunk *Chunk) *string {
 	endDate := chunk.StartDate.AddDate(0, oneMonth, 0)
 
 	// Generate TypeOwn (Others field)
-	othersResultChannel := make(chan AsyncAggregateResult)
-	go m.queryTypeOwnSum(*chunk.StartDate, endDate, othersResultChannel)
+	othersResultChannel := make(chan database.AsyncAggregateResult)
+	go m.db.QueryTypeOwnSum(*chunk.StartDate, endDate, othersResultChannel)
 
 	// Generate Reimbursement (reimbursement field, will be negative)
-	reimResultChannel := make(chan AsyncAggregateResult)
-	go m.queryReimburseSum(*chunk.StartDate, endDate, reimResultChannel)
+	reimResultChannel := make(chan database.AsyncAggregateResult)
+	go m.db.QueryReimburseSum(*chunk.StartDate, endDate, reimResultChannel)
 
 	// Generate shared expenses (list of transactions)
-	sharedResultChannel := make(chan AsyncTransactionResults)
-	go m.querySharedTransactions(*chunk.StartDate, endDate, sharedResultChannel)
+	sharedResultChannel := make(chan database.AsyncTransactionResults)
+	go m.db.QuerySharedTransactions(*chunk.StartDate, endDate, sharedResultChannel)
 
 	// Generate all misc expenses
-	miscResultChannel := make(chan AsyncTransactionResults)
-	go m.queryMiscTransactions(*chunk.StartDate, endDate, miscResultChannel)
+	miscResultChannel := make(chan database.AsyncTransactionResults)
+	go m.db.QueryMiscTransactions(*chunk.StartDate, endDate, miscResultChannel)
 
 	othersResult := <-othersResultChannel
 	if othersResult.Error != nil {
@@ -287,76 +275,4 @@ func (m *ProcessorManager) processChunkGenerate(chunk *Chunk) *string {
 	res := strings.Join(resStrings, "\n")
 
 	return &res
-}
-
-func (m *ProcessorManager) queryTypeOwnSum(startDate, endDate time.Time, result chan<- AsyncAggregateResult) {
-	defer close(result)
-	othersOption := &db.FindTransactionOptions{
-		StartDate: startDate,
-		EndDate:   endDate,
-		Types:     []db.TransactionType{db.TypeOwn},
-	}
-
-	othersTotal, err := m.db.AggregateTransactions(othersOption)
-	result <- AsyncAggregateResult{
-		Result: othersTotal,
-		Error:  err,
-	}
-}
-
-func (m *ProcessorManager) queryReimburseSum(startDate, endDate time.Time, result chan<- AsyncAggregateResult) {
-	defer close(result)
-	reimOption := &db.FindTransactionOptions{
-		StartDate: startDate,
-		EndDate:   endDate,
-		Types: []db.TransactionType{
-			db.TypeReimburse,
-			db.TypeSharedReimburse,
-			db.TypeSpecialSharedReimburse,
-		},
-	}
-
-	reimTotal, err := m.db.AggregateTransactions(reimOption)
-	result <- AsyncAggregateResult{
-		Result: reimTotal,
-		Error:  err,
-	}
-}
-
-func (m *ProcessorManager) querySharedTransactions(startDate, endDate time.Time, result chan<- AsyncTransactionResults) {
-	defer close(result)
-	sharedOption := &db.FindTransactionOptions{
-		StartDate: startDate,
-		EndDate:   endDate,
-		Types: []db.TransactionType{
-			db.TypeSharedReimburse,
-			db.TypeSpecialSharedReimburse,
-			db.TypeSpecialShared,
-			db.TypeShared,
-		},
-	}
-	sharedTransactions, err := m.db.QueryTransactionByOptions(sharedOption)
-	result <- AsyncTransactionResults{
-		Result: sharedTransactions,
-		Error:  err,
-	}
-}
-
-func (m *ProcessorManager) queryMiscTransactions(startDate, endDate time.Time, result chan<- AsyncTransactionResults) {
-	defer close(result)
-	sharedOption := &db.FindTransactionOptions{
-		StartDate: startDate,
-		EndDate:   endDate,
-		Types: []db.TransactionType{
-			db.TypeCreditCard,
-			db.TypeInsurance,
-			db.TypeTax,
-			db.TypeTithe,
-		},
-	}
-	sharedTransactions, err := m.db.QueryTransactionByOptions(sharedOption)
-	result <- AsyncTransactionResults{
-		Result: sharedTransactions,
-		Error:  err,
-	}
 }
