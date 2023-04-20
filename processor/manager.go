@@ -8,6 +8,7 @@ import (
 	"time"
 
 	database "github.com/ashwinath/money-tracker-telegram/db"
+	"github.com/ashwinath/money-tracker-telegram/utils"
 )
 
 const HelpMessageTemplate = `
@@ -255,19 +256,38 @@ func (m *ProcessorManager) processChunkGenerate(chunk *Chunk) *string {
 	}
 
 	// other shared spending
+	// Combine them into special and non special, fix all to end of month
+	// Special don't need to combine but non special we should combine
+	//
+	// Sample csv should look like this
+	// 2023-03-31,Special:Renovations,xx.xx
+	// 2023-03-31,Special:Washing Machine,xx.xx
+	// 2023-03-31,others,xx.xx
+
+	nonSpecialSpend := 0.0
+	var otherSpendingDate string
+
 	resStrings = append(resStrings, "---shared_expenses.csv---")
 	for _, tx := range sharedResult.Result {
-		type_ := ""
 		if strings.Contains(string(tx.Type), "SPECIAL") {
-			type_ += "Special:"
+			type_ := fmt.Sprintf("Special:%s", string(tx.Classification))
+			date := utils.SetDateToEndOfMonth(tx.Date)
+			amount := tx.Amount
+			resStrings = append(
+				resStrings,
+				fmt.Sprintf("%s,%s,%.2f", date.Format(time.DateOnly), type_, amount),
+			)
+			continue
 		}
-		type_ += string(tx.Classification)
+		// Combine the non special spends
+		nonSpecialSpend += tx.Amount
+		otherSpendingDate = utils.SetDateToEndOfMonth(tx.Date).Format(time.DateOnly)
+	}
 
-		date := tx.Date
-		amount := tx.Amount
+	if nonSpecialSpend != 0.0 {
 		resStrings = append(
 			resStrings,
-			fmt.Sprintf("%s,%s,%.2f", date.Format(time.DateOnly), type_, amount),
+			fmt.Sprintf("%s,%s,%.2f", otherSpendingDate, "others", nonSpecialSpend),
 		)
 	}
 

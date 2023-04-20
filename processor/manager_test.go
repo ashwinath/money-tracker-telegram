@@ -146,7 +146,7 @@ func TestProcessChunkWithGenerate(t *testing.T) {
 			StartDate:   parseDateForced(t, "2023-04-01"),
 		}
 		reply = m.processChunk(genChunk, time.Now())
-		assert.Equal(t, "```\n---expenses.csv---\n2023-04-30,Others,120.20\n2023-04-30,Reimbursement,-2000.20\n2023-04-30,Tax,500.20\n2023-04-30,Tithe,200.00\n2023-04-30,Credit Card,300.00\n2023-04-30,Insurance,150.00\n---shared_expenses.csv---\n2023-04-02,air tickets,2000.20\n```", *reply)
+		assert.Equal(t, "```\n---expenses.csv---\n2023-04-30,Others,120.20\n2023-04-30,Reimbursement,-2000.20\n2023-04-30,Tax,500.20\n2023-04-30,Tithe,200.00\n2023-04-30,Credit Card,300.00\n2023-04-30,Insurance,150.00\n---shared_expenses.csv---\n2023-04-30,others,2000.20\n```", *reply)
 	})
 	assert.Nil(t, err)
 }
