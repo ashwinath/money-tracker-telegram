@@ -99,6 +99,7 @@ func (h *DataDumpHandler) expenses(w http.ResponseWriter, r *http.Request) {
 
 // all numerical
 // /shared-expenses?month=<?>&year=<?>
+// TODO: Note that the csv export format has changed. Shared spending that is not special is combined
 func (h *DataDumpHandler) sharedExpenses(w http.ResponseWriter, r *http.Request) {
 	startDate, endDate, err := getDatesToProcess(r)
 	if err != nil {
