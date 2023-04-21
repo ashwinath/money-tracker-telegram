@@ -8,6 +8,7 @@ import (
 	"time"
 
 	database "github.com/ashwinath/money-tracker-telegram/db"
+	"github.com/ashwinath/money-tracker-telegram/utils"
 )
 
 const oneMonth = 1
@@ -99,7 +100,6 @@ func (h *DataDumpHandler) expenses(w http.ResponseWriter, r *http.Request) {
 
 // all numerical
 // /shared-expenses?month=<?>&year=<?>
-// TODO: Note that the csv export format has changed. Shared spending that is not special is combined
 func (h *DataDumpHandler) sharedExpenses(w http.ResponseWriter, r *http.Request) {
 	startDate, endDate, err := getDatesToProcess(r)
 	if err != nil {
@@ -117,19 +117,31 @@ func (h *DataDumpHandler) sharedExpenses(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	nonSpecialSpend := 0.0
+	var otherSpendingDate time.Time
+
 	var sharedExpenses []expenseStruct
 	for _, tx := range sharedResult.Result {
-		type_ := ""
 		if strings.Contains(string(tx.Type), "SPECIAL") {
-			type_ += "Special:"
+			type_ := fmt.Sprintf("Special:%s", string(tx.Classification))
+			sharedExpenses = append(sharedExpenses, expenseStruct{
+				Date:   utils.SetDateToEndOfMonth(tx.Date),
+				Type:   type_,
+				Amount: tx.Amount,
+			})
+			continue
 		}
-		type_ += string(tx.Classification)
-		sharedExpenses = append(sharedExpenses, expenseStruct{
-			Date:   tx.Date,
-			Type:   type_,
-			Amount: tx.Amount,
-		})
+
+		// Combine all non special spends
+		nonSpecialSpend += tx.Amount
+		otherSpendingDate = utils.SetDateToEndOfMonth(tx.Date)
 	}
+
+	sharedExpenses = append(sharedExpenses, expenseStruct{
+		Date:   otherSpendingDate,
+		Type:   "others",
+		Amount: nonSpecialSpend,
+	})
 
 	ok(w, expensesResponse{sharedExpenses})
 }
