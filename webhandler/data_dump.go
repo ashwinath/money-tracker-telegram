@@ -78,18 +78,18 @@ func (h *DataDumpHandler) expenses(w http.ResponseWriter, r *http.Request) {
 
 	var expenses []expenseStruct
 	expenses = append(expenses, expenseStruct{
-		Date:   *endDate,
+		Date:   utils.SetDateToEndOfMonth(*startDate),
 		Type:   "Others",
 		Amount: *othersResult.Result,
 	})
 	expenses = append(expenses, expenseStruct{
-		Date:   *endDate,
+		Date:   utils.SetDateToEndOfMonth(*startDate),
 		Type:   "Reimbursement",
 		Amount: *reimResult.Result * -1,
 	})
 	for _, result := range miscResult.Result {
 		expenses = append(expenses, expenseStruct{
-			Date:   *endDate,
+			Date:   utils.SetDateToEndOfMonth(*startDate),
 			Type:   strings.Title(strings.ToLower(string(result.Type))),
 			Amount: result.Amount,
 		})
