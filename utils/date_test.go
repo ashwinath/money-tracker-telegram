@@ -11,7 +11,11 @@ import (
 func parseDate(t *testing.T, year, month, day int) time.Time {
 	loc, err := time.LoadLocation("Asia/Singapore")
 	assert.Nil(t, err)
-	ret, err := time.ParseInLocation(time.DateOnly, fmt.Sprintf("%d-%02d-%d", year, month, day), loc)
+	ret, err := time.ParseInLocation(
+		time.DateTime,
+		fmt.Sprintf("%d-%02d-%02d 16:00:00", year, month, day),
+		loc,
+	)
 	assert.Nil(t, err)
 	return ret
 }

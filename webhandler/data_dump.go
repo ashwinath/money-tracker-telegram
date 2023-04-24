@@ -175,5 +175,4 @@ func getDatesToProcess(r *http.Request) (*time.Time, *time.Time, error) {
 	endDate := startDate.AddDate(0, oneMonth, 0)
 
 	return &startDate, &endDate, nil
-
 }
