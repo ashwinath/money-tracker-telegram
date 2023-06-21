@@ -38,7 +38,7 @@ whatever you want | whatever description you give it
 
 ### Adding a transaction
 
-User: `ADD <TYPE> <CLASSIFICATION> <PRICE (no $ sign)> <Optional date (will automatically fix to yyyy-mm-dd)>`
+User: ADD <TYPE> <CLASSIFICATION> <PRICE (no $ sign)> <Optional date (will automatically fix to yyyy-mm-dd)>
 Service returns: ```
 Created Transaction ID: 5
 Date: 2023-04-02 14:14:48 +0800 +08
@@ -49,7 +49,7 @@ Amount:123.200000
 
 ### Deleting a transaction
 
-User: `DEL <ID>`
+User: DEL <ID>
 Service returns: ```
 Deleted Transaction ID: 5
 Date: 2023-04-02 14:14:48 +0800 +08
@@ -60,7 +60,7 @@ Amount:123.200000
 
 ### Generating a report by month
 
-User: `GEN APR 2023`
+User: GEN APR 2023
 Service returns: 
 ```
 ---expenses.csv---
