@@ -184,6 +184,22 @@ func (d *DB) QuerySharedTransactions(startDate, endDate time.Time, result chan<-
 	}
 }
 
+func (d *DB) QuerySharedReimCCTransactions(startDate, endDate time.Time, result chan<- AsyncTransactionResults) {
+	defer close(result)
+	sharedOption := &FindTransactionOptions{
+		StartDate: startDate,
+		EndDate:   endDate,
+		Types: []TransactionType{
+			TypeSharedCCReimburse,
+		},
+	}
+	sharedTransactions, err := d.QueryTransactionByOptions(sharedOption)
+	result <- AsyncTransactionResults{
+		Result: sharedTransactions,
+		Error:  err,
+	}
+}
+
 func (d *DB) QueryMiscTransactions(startDate, endDate time.Time, result chan<- AsyncTransactionResults) {
 	defer close(result)
 	sharedOption := &FindTransactionOptions{

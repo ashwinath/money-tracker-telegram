@@ -25,6 +25,7 @@ tithe | Amount given to parents.
 cc | Amount paid using credit card.
 tax | Amount paid to the tax man.
 insurance | Amount spent for insurance.
+shared cc reim | Amount used for the shared credit card but for personal use and to be reimbursed
 
 ### Classification
 

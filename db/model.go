@@ -18,6 +18,7 @@ const TypeCreditCard TransactionType = "CREDIT CARD"
 const TypeInsurance TransactionType = "INSURANCE"
 const TypeTithe TransactionType = "TITHE"
 const TypeTax TransactionType = "TAX"
+const TypeSharedCCReimburse TransactionType = "SHARED_CC_REIMBURSE"
 
 type Transaction struct {
 	ID             uint            `gorm:"primaryKey"`

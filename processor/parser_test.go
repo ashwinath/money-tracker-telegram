@@ -184,6 +184,17 @@ func TestParser(t *testing.T) {
 			expectedError: nil,
 		},
 		{
+			name:       "Add shared cc reim",
+			testString: "Add shared cc reim 20.45 2023-03-25",
+			expected: Chunk{
+				Instruction: Add,
+				Type:        db.TypeSharedCCReimburse,
+				Amount:      20.45,
+				Date:        parseDateForced(t, "2023-03-25"),
+			},
+			expectedError: nil,
+		},
+		{
 			name:          "wrong instruction",
 			testString:    "update own computer and monitors 2010",
 			expected:      Chunk{},
@@ -284,6 +295,12 @@ func TestParser(t *testing.T) {
 			testString:    "Add shared special washing machine 810.5",
 			expected:      Chunk{},
 			expectedError: fmt.Errorf("Error: %s, Message: Add shared special washing machine 810.5", errorSuggestAMoreSuitableSpecialSharedType),
+		},
+		{
+			name:          "suggest a better shared cc reim",
+			testString:    "Add shared cc 100",
+			expected:      Chunk{},
+			expectedError: errors.New("Error: did you mean shared cc reim?, Message: Add shared cc 100"),
 		},
 	}
 	for _, tt := range tests {

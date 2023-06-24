@@ -110,9 +110,19 @@ func (h *DataDumpHandler) sharedExpenses(w http.ResponseWriter, r *http.Request)
 	sharedResultChannel := make(chan database.AsyncTransactionResults)
 	go h.db.QuerySharedTransactions(*startDate, *endDate, sharedResultChannel)
 
+	sharedReimCCResultChannel := make(chan database.AsyncTransactionResults)
+	go h.db.QuerySharedReimCCTransactions(*startDate, *endDate, sharedReimCCResultChannel)
+
 	sharedResult := <-sharedResultChannel
 	if sharedResult.Error != nil {
 		err := fmt.Errorf(databaseQueryErrorFormat, sharedResult.Error)
+		badRequest(w, err)
+		return
+	}
+
+	sharedReimCCResult := <-sharedReimCCResultChannel
+	if sharedReimCCResult.Error != nil {
+		err := fmt.Errorf(databaseQueryErrorFormat, sharedReimCCResult.Error)
 		badRequest(w, err)
 		return
 	}
@@ -137,10 +147,16 @@ func (h *DataDumpHandler) sharedExpenses(w http.ResponseWriter, r *http.Request)
 		otherSpendingDate = utils.SetDateToEndOfMonth(tx.Date)
 	}
 
+	// subtract shared reim cc result
+	sharedCCReimAmount := 0.0
+	for _, tx := range sharedReimCCResult.Result {
+		sharedCCReimAmount += tx.Amount
+	}
+
 	sharedExpenses = append(sharedExpenses, expenseStruct{
 		Date:   otherSpendingDate,
 		Type:   "others",
-		Amount: nonSpecialSpend,
+		Amount: nonSpecialSpend - sharedCCReimAmount,
 	})
 
 	ok(w, expensesResponse{sharedExpenses})

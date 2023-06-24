@@ -24,6 +24,11 @@ Classification Types:
 - SPECIAL SHARED
 - OWN
 - SPECIAL OWN
+- TITHE
+- CC
+- TAX
+- INSURANCE
+- SHARED CC REIM
 
 _Adding a transaction_
 
@@ -200,6 +205,10 @@ func (m *ProcessorManager) processChunkGenerate(chunk *Chunk) *string {
 	sharedResultChannel := make(chan database.AsyncTransactionResults)
 	go m.db.QuerySharedTransactions(*chunk.StartDate, endDate, sharedResultChannel)
 
+	// Generate shared reim cc expenses (list of transactions)
+	sharedReimCCResultChannel := make(chan database.AsyncTransactionResults)
+	go m.db.QuerySharedReimCCTransactions(*chunk.StartDate, endDate, sharedReimCCResultChannel)
+
 	// Generate all misc expenses
 	miscResultChannel := make(chan database.AsyncTransactionResults)
 	go m.db.QueryMiscTransactions(*chunk.StartDate, endDate, miscResultChannel)
@@ -219,6 +228,12 @@ func (m *ProcessorManager) processChunkGenerate(chunk *Chunk) *string {
 	sharedResult := <-sharedResultChannel
 	if sharedResult.Error != nil {
 		err := fmt.Sprintf(databaseQueryErrorFormat, sharedResult.Error)
+		return &err
+	}
+
+	sharedReimCCResult := <-sharedReimCCResultChannel
+	if sharedReimCCResult.Error != nil {
+		err := fmt.Sprintf(databaseQueryErrorFormat, sharedReimCCResult.Error)
 		return &err
 	}
 
@@ -284,10 +299,17 @@ func (m *ProcessorManager) processChunkGenerate(chunk *Chunk) *string {
 		otherSpendingDate = utils.SetDateToEndOfMonth(tx.Date).Format(time.DateOnly)
 	}
 
-	if nonSpecialSpend != 0.0 {
+	// subtract shared reim cc result
+	sharedCCReimAmount := 0.0
+	for _, tx := range sharedReimCCResult.Result {
+		sharedCCReimAmount += tx.Amount
+	}
+
+	totalNonSpecialSpend := nonSpecialSpend - sharedCCReimAmount
+	if totalNonSpecialSpend != 0.0 {
 		resStrings = append(
 			resStrings,
-			fmt.Sprintf("%s,%s,%.2f", otherSpendingDate, "others", nonSpecialSpend),
+			fmt.Sprintf("%s,%s,%.2f", otherSpendingDate, "others", totalNonSpecialSpend),
 		)
 	}
 

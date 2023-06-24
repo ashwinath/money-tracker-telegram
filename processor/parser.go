@@ -32,6 +32,7 @@ const (
 	errorFormatYearOutOfRange                  = "year out of range (1970 - 2200 allowed): %d"
 	errorFormatMonthToken                      = "unable to parse month: %s"
 	errorSuggestAMoreSuitableSpecialSharedType = "did you mean special shared?"
+	errorSuggestAMoreSuitableSharedCCType      = "did you mean shared cc reim?"
 	errorEmptyClassificationToken              = "empty classification token"
 	errorEmptyTypeToken                        = "empty type token"
 	errorEmptyAmountToken                      = "empty amount token"
@@ -42,10 +43,11 @@ const (
 )
 
 var typesWithoutClassification = map[db.TransactionType]struct{}{
-	db.TypeCreditCard: {},
-	db.TypeInsurance:  {},
-	db.TypeTithe:      {},
-	db.TypeTax:        {},
+	db.TypeCreditCard:        {},
+	db.TypeInsurance:         {},
+	db.TypeTithe:             {},
+	db.TypeTax:               {},
+	db.TypeSharedCCReimburse: {},
 }
 
 type Chunk struct {
@@ -214,6 +216,14 @@ func (p *parser) transactionType() (db.TransactionType, error) {
 		if strings.ToUpper(*p.peekCurrent()) == "SPECIAL" {
 			// Courtesy message that special before shared.
 			return TypeNone, errors.New(errorSuggestAMoreSuitableSpecialSharedType)
+		}
+		if strings.ToUpper(*p.peekCurrent()) == "CC" {
+			p.next()
+			if strings.ToUpper(*p.peekCurrent()) == "REIM" {
+				p.next()
+				return db.TypeSharedCCReimburse, nil
+			}
+			return TypeNone, errors.New(errorSuggestAMoreSuitableSharedCCType)
 		}
 		return db.TypeShared, nil
 	case "SPECIAL":
