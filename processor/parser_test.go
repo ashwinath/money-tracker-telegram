@@ -185,12 +185,13 @@ func TestParser(t *testing.T) {
 		},
 		{
 			name:       "Add shared cc reim",
-			testString: "Add shared cc reim 20.45 2023-03-25",
+			testString: "Add shared cc reim petrol 20.45 2023-03-25",
 			expected: Chunk{
-				Instruction: Add,
-				Type:        db.TypeSharedCCReimburse,
-				Amount:      20.45,
-				Date:        parseDateForced(t, "2023-03-25"),
+				Instruction:    Add,
+				Type:           db.TypeSharedCCReimburse,
+				Classification: "petrol",
+				Amount:         20.45,
+				Date:           parseDateForced(t, "2023-03-25"),
 			},
 			expectedError: nil,
 		},

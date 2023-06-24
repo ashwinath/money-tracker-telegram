@@ -43,11 +43,10 @@ const (
 )
 
 var typesWithoutClassification = map[db.TransactionType]struct{}{
-	db.TypeCreditCard:        {},
-	db.TypeInsurance:         {},
-	db.TypeTithe:             {},
-	db.TypeTax:               {},
-	db.TypeSharedCCReimburse: {},
+	db.TypeCreditCard: {},
+	db.TypeInsurance:  {},
+	db.TypeTithe:      {},
+	db.TypeTax:        {},
 }
 
 type Chunk struct {
