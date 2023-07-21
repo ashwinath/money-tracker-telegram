@@ -6,6 +6,7 @@ image:
     # -- Override this value for the desired image tag
   tag: latest
 
+replicas: 1
 nameOverride: ""
 fullnameOverride: ""
 podAnnotations: {}
