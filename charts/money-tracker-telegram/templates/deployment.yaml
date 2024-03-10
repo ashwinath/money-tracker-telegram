@@ -20,6 +20,8 @@ spec:
       labels:
         {{- include "money-tracker-telegram.selectorLabels" . | nindent 8 }}
     spec:
+      nodeSelector:
+        {{- toYaml .Values.nodeSelectors | nindent 8 }}
       initContainers:
       - name: check-db-ready
         image: postgres:15.2

@@ -12,6 +12,7 @@ fullnameOverride: ""
 podAnnotations: {}
 # -- Resources requests and limits for the application
 resources: {}
+nodeSelectors: {}
 
 config:
   # -- Telegram API key, must be filled in.
