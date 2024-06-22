@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/ashwinath/money-tracker-telegram/db"
+	"github.com/ashwinath/money-tracker-telegram/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,6 +18,11 @@ func parseDateForced(t *testing.T, dateString string) *time.Time {
 	parsed, err := time.ParseInLocation(time.DateOnly, dateString, loc)
 	assert.Nil(t, err)
 
+	return &parsed
+}
+
+func yesterday() *time.Time {
+	parsed := utils.TruncateToNearestMinute(time.Now().AddDate(0, 0, -1))
 	return &parsed
 }
 
@@ -113,6 +119,18 @@ func TestParser(t *testing.T) {
 				Classification: "dinner",
 				Amount:         12.5,
 				Date:           parseDateForced(t, "2020-10-02"),
+			},
+			expectedError: nil,
+		},
+		{
+			name:       "Add shared yesterday",
+			testString: "Add shared dinner meal 13.5 yesterday",
+			expected: Chunk{
+				Instruction:    Add,
+				Type:           db.TypeShared,
+				Classification: "dinner meal",
+				Amount:         13.5,
+				Date:           yesterday(),
 			},
 			expectedError: nil,
 		},

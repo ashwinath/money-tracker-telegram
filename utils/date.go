@@ -16,3 +16,7 @@ func SetDateToEndOfMonth(d time.Time) time.Time {
 	)
 	return ret.AddDate(0, 1, 0).AddDate(0, 0, -1)
 }
+
+func TruncateToNearestMinute(x time.Time) time.Time {
+	return x.Truncate(time.Minute)
+}

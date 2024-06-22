@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/ashwinath/money-tracker-telegram/db"
+	"github.com/ashwinath/money-tracker-telegram/utils"
 )
 
 // Only used for parser
@@ -326,9 +327,14 @@ func (p *parser) date() (*time.Time, error) {
 		return nil, err
 	}
 
-	parsed, err := time.ParseInLocation(time.DateOnly, *token, loc)
-	if err != nil {
-		return nil, err
+	var parsed time.Time
+	if *token == "yesterday" || *token == "ytd" {
+		parsed = utils.TruncateToNearestMinute(time.Now().AddDate(0, 0, -1))
+	} else {
+		parsed, err = time.ParseInLocation(time.DateOnly, *token, loc)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &parsed, nil
