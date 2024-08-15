@@ -1,3 +1,7 @@
+# ⚠️⚠️⚠️⚠️⚠️⚠️⚠️ Deprecated ⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+
+Financials and money-tracker-telegram has been consolidated into one project called [Moneybags](https://github.com/ashwinath/moneybags). Future development work will be based on that repository.
+
 # Money Tracker Telegram
 
 ## Introduction
